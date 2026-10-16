@@ -133,7 +133,7 @@
                 </div>
             </div>
 
-            <!-- Bouton Démarrer la Mission (Apparaît automatiquement ou via secours) -->
+            <!-- Bouton Démarrer la Mission (Apparaît dès le lancement de la vidéo ou via secours) -->
             <div id="start-mission-wrapper" class="hidden w-full max-w-md flex flex-col items-center mt-4 transition-all duration-700 opacity-0 transform translate-y-4">
                 <button id="btn-start-mission" class="tilt-card w-full relative group overflow-hidden rounded-xl p-[2px] focus:outline-none shadow-2xl">
                     <span class="absolute inset-0 bg-gradient-to-r from-red-600 via-orange-500 to-red-600 rounded-xl animate-pulse"></span>
@@ -254,7 +254,7 @@
         const indiceCounterEl = document.getElementById('indice-counter');
         const phasesAccordionList = document.getElementById('phases-accordion-list');
 
-        // Fonction pour afficher le bouton "DÉMARRER LA MISSION" de manière garantie
+        // Fonction pour afficher le bouton "DÉMARRER LA MISSION" de manière garantie dès le lancement
         function revealStartMissionButton() {
             if (missionStarted) return;
             missionStarted = true;
@@ -263,7 +263,6 @@
                 startMissionWrapper.classList.remove('opacity-0', 'translate-y-4');
                 startMissionWrapper.classList.add('opacity-100', 'translate-y-0');
             }, 50);
-            startMissionWrapper.scrollIntoView({ behavior: 'smooth' });
         }
 
         // Lancer la vidéo au clic
@@ -275,6 +274,9 @@
                 videoContainer.classList.add('scale-100', 'opacity-100');
             }, 50);
 
+            // Affiche immédiatement le bouton Démarrer la mission dès que le briefing se lance
+            revealStartMissionButton();
+
             let playPromise = briefingVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
@@ -284,123 +286,10 @@
             }
         });
 
-        // Détection de fin de vidéo standard
-        briefingVideo.addEventListener('ended', () => {
-            revealStartMissionButton();
-        });
-
-        // Secours si la vidéo est proche de la fin ou si l'utilisateur clique sur forcer
+        // Secours si le lecteur vidéo rencontre un problème
         skipVideoBtn.addEventListener('click', () => {
             revealStartMissionButton();
         });
 
-        // Sécurité supplémentaire : si l'utilisateur clique sur la vidéo ou la met en pause vers la fin
-        briefingVideo.addEventListener('timeupdate', () => {
-            if (briefingVideo.duration && briefingVideo.currentTime >= briefingVideo.duration - 0.5) {
-                revealStartMissionButton();
-            }
-        });
-
         // Effet Tilt dynamique sur le bouton "Démarrer la mission"
         btnStartMission.addEventListener('mousemove', (e) => {
-            const rect = btnStartMission.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            btnStartMission.style.transform = `perspective(1000px) rotateX(${-y / 5}deg) rotateY(${x / 5}deg) scale3d(1.02, 1.02, 1.02)`;
-        });
-
-        btnStartMission.addEventListener('mouseleave', () => {
-            btnStartMission.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-        });
-
-        // Passage à la Phase 2
-        btnStartMission.addEventListener('click', () => {
-            phase1Container.classList.add('hidden');
-            phase2Container.classList.remove('hidden');
-            buildIndicesUI();
-            startTimer();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        // Chronomètre 60 minutes
-        function startTimer() {
-            updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                if (totalTimeSeconds > 0) {
-                    totalTimeSeconds--;
-                    updateTimerDisplay();
-                } else {
-                    clearInterval(timerInterval);
-                    timerDisplay.textContent = "00:00";
-                    timerDisplay.classList.add('text-red-500');
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(totalTimeSeconds / 60);
-            const seconds = totalTimeSeconds % 60;
-            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-
-        // Construction de l'interface des indices
-        function buildIndicesUI() {
-            phasesAccordionList.innerHTML = '';
-            
-            escapeData.forEach((phaseObj, pIndex) => {
-                const phaseCard = document.createElement('div');
-                phaseCard.className = 'bg-cyber-card border border-cyber-border rounded-xl overflow-hidden shadow-md';
-                
-                const phaseHeader = document.createElement('div');
-                phaseHeader.className = 'bg-cyber-dark px-4 py-3 border-b border-cyber-border font-mono-tech font-bold text-cyan-300 flex items-center justify-between text-sm md:text-base';
-                phaseHeader.innerHTML = `<span>${phaseObj.phase}</span> <span class="text-xs text-slate-500">${phaseObj.indices.length} indices</span>`;
-                phaseCard.appendChild(phaseHeader);
-
-                const indicesBody = document.createElement('div');
-                indicesBody.className = 'p-3 space-y-2';
-
-                phaseObj.indices.forEach((indiceText, iIndex) => {
-                    const indiceBox = document.createElement('div');
-                    indiceBox.className = 'border border-cyber-border rounded-lg overflow-hidden bg-cyber-black/40';
-
-                    const indiceBtn = document.createElement('button');
-                    indiceBtn.className = 'w-full text-left px-4 py-3 font-mono-tech text-xs md:text-sm text-slate-300 hover:text-cyan-400 hover:bg-cyber-dark/80 flex items-center justify-between transition focus:outline-none';
-                    indiceBtn.innerHTML = `<span>Indice ${iIndex + 1}</span> <span class="text-cyan-500 transform transition-transform duration-300 font-bold">▼</span>`;
-                    
-                    const indiceContent = document.createElement('div');
-                    indiceContent.className = 'indice-content px-4 text-xs md:text-sm text-slate-300 bg-cyber-dark/40 font-mono-tech leading-relaxed border-t border-transparent';
-                    indiceContent.innerHTML = `<p class="py-3 border-t border-cyber-border/50 text-slate-200">${indiceText}</p>`;
-
-                    indiceBtn.addEventListener('click', () => {
-                        const isOpen = indiceContent.classList.contains('open');
-                        
-                        if (!isOpen) {
-                            indiceContent.classList.add('open');
-                            indiceBtn.querySelector('span:last-child').style.transform = 'rotate(180deg)';
-                            
-                            if (!indiceBtn.dataset.consulted) {
-                                indiceBtn.dataset.consulted = 'true';
-                                consultationCount++;
-                                indiceCounterEl.textContent = consultationCount;
-                                indiceCounterEl.classList.add('scale-125');
-                                setTimeout(() => indiceCounterEl.classList.remove('scale-125'), 200);
-                            }
-                        } else {
-                            indiceContent.classList.remove('open');
-                            indiceBtn.querySelector('span:last-child').style.transform = 'rotate(0deg)';
-                        }
-                    });
-
-                    indiceBox.appendChild(indiceBtn);
-                    indiceBox.appendChild(indiceContent);
-                    indicesBody.appendChild(indiceBox);
-                });
-
-                phaseCard.appendChild(indicesBody);
-                phasesAccordionList.appendChild(phaseCard);
-            });
-        }
-    </script>
-</body>
-</html>
-```
