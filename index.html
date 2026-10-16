@@ -42,7 +42,6 @@
         .font-mono-tech {
             font-family: 'Share Tech Mono', monospace;
         }
-        /* Effet néon lueur */
         .neon-glow-red {
             text-shadow: 0 0 10px rgba(255, 42, 42, 0.7), 0 0 20px rgba(255, 42, 42, 0.4);
         }
@@ -55,12 +54,10 @@
         .box-glow-red {
             box-shadow: 0 0 15px rgba(255, 42, 42, 0.3), inset 0 0 15px rgba(255, 42, 42, 0.05);
         }
-        /* Effet Tilt */
         .tilt-card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             transform-style: preserve-3d;
         }
-        /* Animation scanline discret */
         .scanlines {
             background: linear-gradient(
                 rgba(18, 18, 26, 0) 50%, 
@@ -74,7 +71,6 @@
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
         }
-        /* Styles personnalisés pour accordéon */
         .indice-content {
             max-height: 0;
             overflow: hidden;
@@ -88,7 +84,7 @@
 </head>
 <body class="bg-cyber-black text-slate-100 min-h-screen flex flex-col justify-between relative">
 
-    <!-- Superposition Scanlines Ambiance Laboratoire Urgent -->
+    <!-- Superposition Scanlines Ambiance Labo -->
     <div class="absolute inset-0 scanlines z-50 pointer-events-none fixed"></div>
 
     <!-- Conteneur Principal -->
@@ -97,10 +93,8 @@
         <!-- LOGO EN HAUT AU CENTRE -->
         <header class="w-full flex flex-col items-center mb-8">
             <div class="relative group cursor-pointer" onclick="location.reload();">
-                <!-- Fallback visuel élégant si l'image n'est pas chargée -->
                 <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-cyan-500 rounded-lg blur opacity-40 group-hover:opacity-75 transition duration-500"></div>
                 <div class="relative bg-cyber-card border border-cyber-border px-6 py-4 rounded-xl flex items-center justify-center space-x-3 shadow-2xl">
-                    <!-- Image demandée -->
                     <img src="PATIENT ZERO-LOGO.png" alt="PATIENT ZERO LOGO" 
                          onerror="this.onerror=null; this.src='https://placehold.co/220x60/12121a/00f0ff?text=PATIENT+ZERO';" 
                          class="h-12 md:h-16 object-contain filter drop-shadow-[0_0_8px_rgba(0,240,255,0.5)]">
@@ -120,29 +114,27 @@
                 </span>
             </button>
 
-            <!-- Conteneur Vidéo (Portrait Responsive) -->
+            <!-- Conteneur Vidéo (Format Portrait Responsive) -->
             <div id="video-container" class="hidden w-full max-w-sm flex flex-col items-center transition-all duration-500 transform scale-95 opacity-0">
                 <div class="w-full bg-cyber-card border-2 border-cyan-500/40 rounded-2xl overflow-hidden box-glow-cyan p-2">
                     <div class="relative w-full aspect-[9/16] bg-black rounded-xl overflow-hidden flex items-center justify-center">
                         <video id="briefing-video" class="w-full h-full object-cover" controls playsinline>
                             <source src="video-briefing.mp4" type="video/mp4">
-                            <!-- Fallback vidéo intégrée si fichier manquant -->
                             Votre navigateur ne supporte pas la lecture de vidéos.
                         </video>
-                        <!-- Message indicatif si vidéo non trouvée -->
+                        <!-- Panneau de secours si le fichier vidéo est absent ou bloqué -->
                         <div id="video-error-msg" class="absolute inset-0 bg-cyber-black/90 flex flex-col items-center justify-center p-6 text-center hidden">
                             <svg class="w-12 h-12 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                             <p class="text-sm font-mono-tech text-red-400 mb-2">Fichier "video-briefing.mp4" introuvable.</p>
-                            <p class="text-xs text-slate-400">Simulation de lecture activée pour passer à la mission.</p>
-                            <button id="skip-video-btn" class="mt-4 px-4 py-2 bg-red-600/30 border border-red-500 text-red-300 rounded-lg text-xs font-mono-tech hover:bg-red-600/50 transition">SIMULER FIN DE VIDÉO</button>
+                            <p class="text-xs text-slate-400">Cliquez ci-dessous pour débloquer la mission immédiatement.</p>
+                            <button id="skip-video-btn" class="mt-4 px-4 py-2 bg-red-600/30 border border-red-500 text-red-300 rounded-lg text-xs font-mono-tech hover:bg-red-600/50 transition">FORCER FIN DE VIDÉO</button>
                         </div>
                     </div>
                 </div>
-                <p class="text-xs text-slate-400 mt-2 text-center font-mono-tech">Format portrait optimisé - Regardez attentivement le briefing.</p>
             </div>
 
-            <!-- Bouton Démarrer la Mission (Apparaît après la vidéo) -->
-            <div id="start-mission-wrapper" class="hidden w-full max-w-md flex flex-col items-center mt-4">
+            <!-- Bouton Démarrer la Mission (Apparaît automatiquement ou via secours) -->
+            <div id="start-mission-wrapper" class="hidden w-full max-w-md flex flex-col items-center mt-4 transition-all duration-700 opacity-0 transform translate-y-4">
                 <button id="btn-start-mission" class="tilt-card w-full relative group overflow-hidden rounded-xl p-[2px] focus:outline-none shadow-2xl">
                     <span class="absolute inset-0 bg-gradient-to-r from-red-600 via-orange-500 to-red-600 rounded-xl animate-pulse"></span>
                     <span class="relative block bg-gradient-to-r from-red-950 to-cyber-card px-8 py-5 rounded-xl font-black tracking-widest text-red-400 group-hover:text-white transition duration-300 text-center uppercase font-mono-tech text-xl neon-glow-red">
@@ -153,10 +145,10 @@
 
         </div>
 
-        <!-- ================= PHASE 2 : INTERFACE DE JEU & INDICES ================= -->
+        <!-- ================= PHASE 2 : JEU & INDICES ================= -->
         <div id="phase2-container" class="hidden w-full flex flex-col items-center space-y-6">
             
-            <!-- Tableau de Bord : Décompte & Compteur d'indices -->
+            <!-- Tableaux de bord : Chrono & Compteur -->
             <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Décompte Temps -->
                 <div class="bg-cyber-card border border-cyan-500/30 rounded-xl p-4 flex flex-col items-center justify-center box-glow-cyan">
@@ -165,7 +157,7 @@
                 </div>
                 <!-- Compteur d'Indices -->
                 <div class="bg-cyber-card border border-red-500/30 rounded-xl p-4 flex flex-col items-center justify-center box-glow-red">
-                    <span class="text-xs font-mono-tech text-red-400 uppercase tracking-widest mb-1">Indices Consultés</span>
+                    <span class="text-xs font-mono-tech text-red-400 uppercase tracking-widest mb-1">NOMBRE D'INDICES CONSULTÉS :</span>
                     <div id="indice-counter" class="text-3xl md:text-4xl font-mono-tech font-bold text-red-400 neon-glow-red">0</div>
                 </div>
             </div>
@@ -179,16 +171,15 @@
                 </p>
             </div>
 
-            <!-- Section Indices par Phase -->
+            <!-- Section Indices par Énigme -->
             <div class="w-full space-y-6">
                 <div class="border-b border-cyber-border pb-2 flex items-center justify-between">
                     <h2 class="text-lg font-mono-tech font-bold text-cyan-400 tracking-wider uppercase">📂 Dossier des Indices</h2>
-                    <span class="text-xs text-slate-400 font-mono-tech">Sécurisé Niveaux 01-05</span>
+                    <span class="text-xs text-slate-400 font-mono-tech">Niveaux 01 à 05</span>
                 </div>
 
-                <!-- ACCORDÉON DES PHASES -->
                 <div id="phases-accordion-list" class="space-y-4">
-                    <!-- Généré dynamiquement en JS pour garantir l'exactitude des textes -->
+                    <!-- Généré dynamiquement en JS -->
                 </div>
             </div>
 
@@ -196,14 +187,13 @@
 
     </div>
 
-    <!-- Pied de Page Minimaliste -->
+    <!-- Pied de Page -->
     <footer class="w-full py-4 text-center border-t border-cyber-border text-xs font-mono-tech text-slate-400 z-10 bg-cyber-black/80 backdrop-blur">
         PATIENT ZERO ESCAPE LAB &copy; 2026 — Tous droits réservés
     </footer>
 
-    <!-- Script Logique Métier -->
+    <!-- Script JavaScript Complet & Fiabilisé -->
     <script>
-        // Données complètes des indices par phase
         const escapeData = [
             {
                 phase: "PHASE 01 — PROTOCOLE",
@@ -248,8 +238,8 @@
         let consultationCount = 0;
         let timerInterval = null;
         let totalTimeSeconds = 60 * 60; // 60 minutes
+        let missionStarted = false;
 
-        // Éléments du DOM
         const btnLaunchVideo = document.getElementById('btn-launch-video');
         const videoContainer = document.getElementById('video-container');
         const briefingVideo = document.getElementById('briefing-video');
@@ -264,7 +254,19 @@
         const indiceCounterEl = document.getElementById('indice-counter');
         const phasesAccordionList = document.getElementById('phases-accordion-list');
 
-        // Gestion de l'affichage de la vidéo au clic
+        // Fonction pour afficher le bouton "DÉMARRER LA MISSION" de manière garantie
+        function revealStartMissionButton() {
+            if (missionStarted) return;
+            missionStarted = true;
+            startMissionWrapper.classList.remove('hidden');
+            setTimeout(() => {
+                startMissionWrapper.classList.remove('opacity-0', 'translate-y-4');
+                startMissionWrapper.classList.add('opacity-100', 'translate-y-0');
+            }, 50);
+            startMissionWrapper.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Lancer la vidéo au clic
         btnLaunchVideo.addEventListener('click', () => {
             btnLaunchVideo.classList.add('hidden');
             videoContainer.classList.remove('hidden');
@@ -273,31 +275,31 @@
                 videoContainer.classList.add('scale-100', 'opacity-100');
             }, 50);
 
-            // Tenter de lire la vidéo
             let playPromise = briefingVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
-                    // Autoplay bloqué ou fichier absent
-                    console.log("Lecture vidéo automatique restreinte ou fichier absent:", error);
+                    console.log("Lecture automatique bloquée ou fichier absent:", error);
                     videoErrorMsg.classList.remove('hidden');
                 });
             }
         });
 
-        // Gestion fin de vidéo native
+        // Détection de fin de vidéo standard
         briefingVideo.addEventListener('ended', () => {
             revealStartMissionButton();
         });
 
-        // Bouton simuler fin de vidéo (si fichier manquant)
+        // Secours si la vidéo est proche de la fin ou si l'utilisateur clique sur forcer
         skipVideoBtn.addEventListener('click', () => {
             revealStartMissionButton();
         });
 
-        function revealStartMissionButton() {
-            startMissionWrapper.classList.remove('hidden');
-            startMissionWrapper.scrollIntoView({ behavior: 'smooth' });
-        }
+        // Sécurité supplémentaire : si l'utilisateur clique sur la vidéo ou la met en pause vers la fin
+        briefingVideo.addEventListener('timeupdate', () => {
+            if (briefingVideo.duration && briefingVideo.currentTime >= briefingVideo.duration - 0.5) {
+                revealStartMissionButton();
+            }
+        });
 
         // Effet Tilt dynamique sur le bouton "Démarrer la mission"
         btnStartMission.addEventListener('mousemove', (e) => {
@@ -320,7 +322,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Lancement du Chronomètre 60 minutes
+        // Chronomètre 60 minutes
         function startTimer() {
             updateTimerDisplay();
             timerInterval = setInterval(() => {
@@ -329,7 +331,7 @@
                     updateTimerDisplay();
                 } else {
                     clearInterval(timerInterval);
-                    timerDisplay.textContent = "TEMPS ÉCOULÉ";
+                    timerDisplay.textContent = "00:00";
                     timerDisplay.classList.add('text-red-500');
                 }
             }, 1000);
@@ -341,7 +343,7 @@
             timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
-        // Construction dynamique de l'interface des indices avec suivi des clics uniques par indice
+        // Construction de l'interface des indices
         function buildIndicesUI() {
             phasesAccordionList.innerHTML = '';
             
@@ -349,19 +351,15 @@
                 const phaseCard = document.createElement('div');
                 phaseCard.className = 'bg-cyber-card border border-cyber-border rounded-xl overflow-hidden shadow-md';
                 
-                // En-tête de phase
                 const phaseHeader = document.createElement('div');
                 phaseHeader.className = 'bg-cyber-dark px-4 py-3 border-b border-cyber-border font-mono-tech font-bold text-cyan-300 flex items-center justify-between text-sm md:text-base';
                 phaseHeader.innerHTML = `<span>${phaseObj.phase}</span> <span class="text-xs text-slate-500">${phaseObj.indices.length} indices</span>`;
                 phaseCard.appendChild(phaseHeader);
 
-                // Conteneur des boutons indices
                 const indicesBody = document.createElement('div');
                 indicesBody.className = 'p-3 space-y-2';
 
                 phaseObj.indices.forEach((indiceText, iIndex) => {
-                    const indiceId = `p${pIndex}-i${iIndex}`;
-                    
                     const indiceBox = document.createElement('div');
                     indiceBox.className = 'border border-cyber-border rounded-lg overflow-hidden bg-cyber-black/40';
 
@@ -373,22 +371,17 @@
                     indiceContent.className = 'indice-content px-4 text-xs md:text-sm text-slate-300 bg-cyber-dark/40 font-mono-tech leading-relaxed border-t border-transparent';
                     indiceContent.innerHTML = `<p class="py-3 border-t border-cyber-border/50 text-slate-200">${indiceText}</p>`;
 
-                    let isRevealed = false;
-
                     indiceBtn.addEventListener('click', () => {
                         const isOpen = indiceContent.classList.contains('open');
                         
-                        // Fermer ou ouvrir
                         if (!isOpen) {
                             indiceContent.classList.add('open');
                             indiceBtn.querySelector('span:last-child').style.transform = 'rotate(180deg)';
                             
-                            // Incrémentation unique par indice consulté
                             if (!indiceBtn.dataset.consulted) {
                                 indiceBtn.dataset.consulted = 'true';
                                 consultationCount++;
                                 indiceCounterEl.textContent = consultationCount;
-                                // Petit effet visuel d'incrémentation
                                 indiceCounterEl.classList.add('scale-125');
                                 setTimeout(() => indiceCounterEl.classList.remove('scale-125'), 200);
                             }
@@ -410,3 +403,4 @@
     </script>
 </body>
 </html>
+```
