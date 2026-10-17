@@ -68,15 +68,26 @@
             display: flex;
         }
 
-        /* Vidéo */
+        /* Vidéo (dépliable) */
         .video-wrapper {
             width: 100%;
             border-radius: 12px;
             overflow: hidden;
+            border: 0 solid var(--primary);
+            box-shadow: 0 0 0 var(--primary-glow);
+            background: #000;
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, margin-bottom 0.5s ease-out, border 0.5s ease-out, box-shadow 0.5s ease-out;
+        }
+
+        .video-wrapper.visible {
+            max-height: 70vh;
+            opacity: 1;
+            margin-bottom: 25px;
             border: 2px solid var(--primary);
             box-shadow: 0 0 20px var(--primary-glow);
-            background: #000;
-            margin-bottom: 25px;
         }
 
         video {
@@ -111,16 +122,7 @@
             color: #000;
         }
 
-        /* Tilt animation pour le démarrage */
-        @keyframes tiltAnim {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(-1.5deg); }
-            75% { transform: rotate(1.5deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        .btn-tilt {
-            animation: tiltAnim 2s infinite ease-in-out;
+        .btn-start {
             background: var(--primary);
             color: #000;
         }
@@ -323,11 +325,11 @@
 
         <!-- ================= PHASE 1 : BRIEFING ================= -->
         <div id="phase-1" class="phase active">
-            <div class="video-wrapper">
+            <div id="video-wrapper" class="video-wrapper">
                 <video id="briefing-video" src="video-briefing.mp4" controls playsinline preload="metadata"></video>
             </div>
             <button id="btn-play-video" class="btn">LANCER LA VIDEO DE BRIEFING</button>
-            <button id="btn-start-mission" class="btn btn-tilt">DÉMARRER LA MISSION</button>
+            <button id="btn-start-mission" class="btn btn-start">DÉMARRER LA MISSION</button>
         </div>
 
         <!-- ================= PHASE 2 : MISSION ================= -->
@@ -417,7 +419,7 @@ Bon courage, l’humanité compte sur vous !</div>
         let gameState = {
             phase: 1, // 1 ou 2
             endTime: null,
-            consultedClues: [], // tableaux d'identifiants uniques d'indices consultés (ex: "0-1")
+            consultedClues: [],
             isSuccess: false
         };
 
@@ -428,6 +430,7 @@ Bon courage, l’humanité compte sur vous !</div>
         // Éléments DOM
         const phase1El = document.getElementById('phase-1');
         const phase2El = document.getElementById('phase-2');
+        const videoWrapperEl = document.getElementById('video-wrapper');
         const videoEl = document.getElementById('briefing-video');
         const btnPlayVideo = document.getElementById('btn-play-video');
         const btnStartMission = document.getElementById('btn-start-mission');
@@ -453,16 +456,13 @@ Bon courage, l’humanité compte sur vous !</div>
         // Gestion des événements
         function setupEventListeners() {
             btnPlayVideo.addEventListener('click', () => {
+                // Déployer la vidéo en douceur et la lancer
+                videoWrapperEl.classList.add('visible');
                 videoEl.play().catch(err => console.log("Lecture vidéo bloquée par le navigateur:", err));
             });
 
-            // Bouton Démarrer la mission (dispo dès le début)
             btnStartMission.addEventListener('click', () => {
                 startMission();
-            });
-
-            videoEl.addEventListener('ended', () => {
-                // La vidéo est finie, le bouton clignote déjà ou reste actif
             });
 
             btnSuccess.addEventListener('click', () => {
@@ -483,6 +483,8 @@ Bon courage, l’humanité compte sur vous !</div>
             saveState();
             switchToPhase2(true);
             requestWakeLock();
+            // Remonter en haut de la page instantanément ou en douceur
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function switchToPhase2(resetTimer) {
@@ -532,17 +534,14 @@ Bon courage, l’humanité compte sur vous !</div>
                     content.textContent = clueText;
 
                     btn.addEventListener('click', () => {
-                        // Si la mission est réussie, on n'ouvre plus les indices
                         if (gameState.isSuccess) return;
 
                         const isOpen = clueItem.classList.contains('open');
                         
-                        // Fermer ou ouvrir
                         if (!isOpen) {
                             clueItem.classList.add('open');
                             btn.setAttribute('aria-expanded', 'true');
 
-                            // Première consultation ?
                             if (!gameState.consultedClues.includes(clueId)) {
                                 gameState.consultedClues.push(clueId);
                                 clueItem.classList.add('consulted');
@@ -593,12 +592,9 @@ Bon courage, l’humanité compte sur vous !</div>
 
                 timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-                // Gestion des alertes visuelles
                 if (timeLeft <= 60 * 1000) {
-                    // Moins d'une minute : clignotement rouge
                     timerEl.classList.add('warning', 'blink');
                 } else if (timeLeft <= 10 * 60 * 1000) {
-                    // Moins de 10 minutes : rouge fixe
                     timerEl.classList.add('warning');
                 }
             }
@@ -617,11 +613,9 @@ Bon courage, l’humanité compte sur vous !</div>
         }
 
         function applySuccessState() {
-            // Masquer les indices
             cluesSection.style.display = 'none';
             btnSuccess.style.display = 'none';
 
-            // Calcul du temps écoulé ou restant
             const now = Date.now();
             const elapsedMs = DURATION_MS - (gameState.endTime - now);
             const totalSecs = Math.max(0, Math.floor(elapsedMs / 1000));
@@ -631,7 +625,6 @@ Bon courage, l’humanité compte sur vous !</div>
             timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
             timerEl.classList.remove('warning', 'blink');
 
-            // Afficher stats de réussite
             const cluesCount = gameState.consultedClues.length;
             successStats.innerHTML = `Temps réalisé : <strong>${String(mins).padStart(2, '0')} min ${String(secs).padStart(2, '0')} s</strong><br>` +
                                      `Indices consultés : <strong>${cluesCount}</strong><br><br>` +
