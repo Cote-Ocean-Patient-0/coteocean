@@ -110,19 +110,25 @@
             background: rgba(0, 242, 254, 0.3);
         }
 
-        /* Tilt & Glow animation for Mission Start button */
+        /* Tilt & Glow animation pour le bouton Démarrer */
         .btn-tilt {
-            animation: tiltAnimation 3s infinite ease-in-out, pulseGlow 2s infinite alternate;
+            animation: pulseGlow 2s infinite alternate;
             background: linear-gradient(135deg, rgba(57, 255, 20, 0.2) 0%, rgba(0, 242, 254, 0.3) 100%);
             border-color: var(--accent-green);
             color: #ffffff;
             box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
         }
 
+        /* Animation tilt spécifiquement appliquée au texte */
+        .tilt-text {
+            display: inline-block;
+            animation: tiltAnimation 3s infinite ease-in-out;
+        }
+
         @keyframes tiltAnimation {
             0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-1.5deg) translateY(-2px); }
-            75% { transform: rotate(1.5deg) translateY(1px); }
+            25% { transform: rotate(-2deg) translateY(-2px); }
+            75% { transform: rotate(2deg) translateY(1px); }
         }
 
         @keyframes pulseGlow {
@@ -375,8 +381,8 @@
                 </video>
             </div>
 
-            <button id="btn-start-mission" class="btn btn-tilt hidden">
-                <span>DÉMARRER LA MISSION</span>
+            <button id="btn-start-mission" class="btn btn-tilt">
+                <span class="tilt-text">DÉMARRER LA MISSION</span>
             </button>
         </main>
 
@@ -543,12 +549,7 @@
                 });
             });
 
-            // Vidéo terminée
-            elVideo.addEventListener('ended', () => {
-                elBtnStartMission.classList.remove('hidden');
-            });
-
-            // Démarrer la mission
+            // Démarrer la mission (disponible dès le départ)
             elBtnStartMission.addEventListener('click', () => {
                 state.currentPhase = 2;
                 state.targetEndTime = Date.now() + MISSION_DURATION_MS;
@@ -629,8 +630,6 @@
                 group.hints.forEach(hint => {
                     const itemEl = document.createElement('div');
                     itemEl.className = 'hint-item';
-
-                    const isOpenedBefore = state.openedHintIds.includes(hint.id);
 
                     const triggerBtn = document.createElement('button');
                     triggerBtn.className = 'hint-trigger';
@@ -723,7 +722,6 @@
             elVideo.currentTime = 0;
             elVideoContainer.style.display = 'none';
             elBtnBriefing.classList.remove('hidden');
-            elBtnStartMission.classList.add('hidden');
             elTimerDisplay.style.fontSize = "3.5rem";
             elTimerBox.classList.remove('timer-warning', 'timer-blink');
 
