@@ -1,122 +1,735 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#050807">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>PATIENT ZERO – Escape Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PATIENT ZERO - Support de Mission</title>
+    <style>
+        /* ==========================================================================
+           CHARTE GRAPHIQUE & DESIGN TOKENS (Laboratoire Sci-Fi / Horreur)
+           ========================================================================== */
+        :root {
+            --bg-color: #05080c;
+            --panel-bg: rgba(13, 22, 33, 0.85);
+            --panel-border: rgba(0, 242, 254, 0.25);
+            --primary-neon: #00f2fe;
+            --primary-glow: rgba(0, 242, 254, 0.4);
+            --accent-green: #39ff14;
+            --danger-red: #ff003c;
+            --danger-glow: rgba(255, 0, 60, 0.6);
+            --text-main: #e0f2fe;
+            --text-muted: #94a3b8;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: "Courier New", Courier, monospace;
+        }
 
-  <style>
-    /* =========================================================
-       VARIABLES DE LA CHARTE (ambiance laboratoire / sci-fi)
-       ========================================================= */
-    :root {
-      --bg: #050807;
-      --panel: #0c1512;
-      --panel-2: #101d18;
-      --text: #e8f3ee;
-      --muted: #a3bcb1;
-      --neon: #39ff88;
-      --neon-soft: rgba(57, 255, 136, 0.35);
-      --neon-faint: rgba(57, 255, 136, 0.08);
-      --danger: #ff4040;
-      --danger-soft: rgba(255, 64, 64, 0.45);
-      --radius: 12px;
-      --maxw: 440px;
-      --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
-    }
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    * { box-sizing: border-box; }
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.08) 0%, transparent 70%),
+                linear-gradient(to bottom, #030508, #070d14);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            overflow-x: hidden;
+        }
 
-    html { -webkit-text-size-adjust: 100%; }
+        /* Layout Container */
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin: 0 auto;
+        }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      background:
-        radial-gradient(ellipse at 50% 0%, rgba(57, 255, 136, 0.10), transparent 60%),
-        radial-gradient(ellipse at 50% 100%, rgba(255, 64, 64, 0.06), transparent 55%),
-        var(--bg);
-      background-attachment: fixed;
-      color: var(--text);
-      font-family: var(--font);
-      line-height: 1.5;
-      padding:
-        max(16px, env(safe-area-inset-top))
-        max(16px, env(safe-area-inset-right))
-        max(24px, env(safe-area-inset-bottom))
-        max(16px, env(safe-area-inset-left));
-      -webkit-tap-highlight-color: transparent;
-    }
+        /* Header Logo */
+        .logo-container {
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+        }
 
-    /* Effet "scanlines" d'écran de labo (purement décoratif) */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.025) 0px,
-        rgba(255, 255, 255, 0.025) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      z-index: 0;
-    }
+        .app-logo {
+            max-width: 280px;
+            width: 80%;
+            height: auto;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.3));
+        }
 
-    main {
-      position: relative;
-      z-index: 1;
-      max-width: var(--maxw);
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
+        /* UI Panels */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
 
-    /* ---------- Logo ---------- */
-    .logo {
-      display: block;
-      width: 80%;
-      max-width: 320px;
-      height: auto;
-      margin: 8px auto 24px;
-      filter: drop-shadow(0 0 12px var(--neon-soft));
-    }
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15) 0%, rgba(0, 150, 255, 0.25) 100%);
+            border: 1px solid var(--primary-neon);
+            color: #ffffff;
+            font-family: var(--font-main);
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 16px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.25s ease;
+            box-shadow: 0 0 15px var(--primary-glow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
 
-    /* ---------- Phases ---------- */
-    .phase { width: 100%; }
-    .phase[hidden] { display: none !important; }
+        .btn:active {
+            transform: scale(0.98);
+            background: rgba(0, 242, 254, 0.3);
+        }
 
-    /* ---------- Boutons principaux ---------- */
-    .btn {
-      appearance: none;
-      -webkit-appearance: none;
-      display: block;
-      width: 100%;
-      min-height: 60px;
-      margin: 0 auto 20px;
-      padding: 16px 20px;
-      border: 2px solid var(--neon);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(57, 255, 136, 0.14), rgba(57, 255, 136, 0.04));
-      color: var(--neon);
-      font-family: var(--font);
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      text-shadow: 0 0 8px var(--neon-soft);
-      box-shadow: 0 0 14px var(--neon-soft), inset 0 0 14px var(--neon-faint);
-      cursor: pointer;
-      transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
-      touch-action: manipulation;
-    }
-    .btn:hover { box-shadow: 0 0 22px var(--neon-soft), inset 0 0 18px var(--neon-faint); }
-    .btn:active { transform:
+        /* Tilt & Glow animation for Mission Start button */
+        .btn-tilt {
+            animation: tiltAnimation 3s infinite ease-in-out, pulseGlow 2s infinite alternate;
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.2) 0%, rgba(0, 242, 254, 0.3) 100%);
+            border-color: var(--accent-green);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
+        }
+
+        @keyframes tiltAnimation {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-1.5deg) translateY(-2px); }
+            75% { transform: rotate(1.5deg) translateY(1px); }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
+            100% { box-shadow: 0 0 25px rgba(57, 255, 20, 0.8); }
+        }
+
+        /* ==========================================================================
+           PHASE 1 : BRIEFING
+           ========================================================================== */
+        #phase-briefing {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            background: #000;
+            display: none;
+        }
+
+        .video-wrapper video {
+            width: 100%;
+            max-height: 65vh;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* ==========================================================================
+           PHASE 2 : MISSION
+           ========================================================================== */
+        #phase-mission {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Countdown Display */
+        .timer-box {
+            text-align: center;
+            background: rgba(5, 10, 18, 0.9);
+            border: 2px solid var(--primary-neon);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: inset 0 0 15px var(--primary-glow), 0 0 15px var(--primary-glow);
+        }
+
+        .timer-title {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .timer-display {
+            font-family: var(--font-mono);
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary-neon);
+            text-shadow: 0 0 20px var(--primary-glow);
+            line-height: 1;
+        }
+
+        /* Timer States */
+        .timer-warning {
+            color: var(--danger-red) !important;
+            border-color: var(--danger-red) !important;
+            box-shadow: inset 0 0 15px var(--danger-glow), 0 0 15px var(--danger-glow) !important;
+            text-shadow: 0 0 20px var(--danger-glow) !important;
+        }
+
+        .timer-blink {
+            animation: blinkEffect 1s infinite;
+        }
+
+        @keyframes blinkEffect {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Counter Display */
+        .hints-counter-box {
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+            background: rgba(0, 242, 254, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px dashed rgba(0, 242, 254, 0.3);
+        }
+
+        .hints-counter-value {
+            color: var(--primary-neon);
+            font-size: 1.2rem;
+            font-family: var(--font-mono);
+        }
+
+        /* Mission Message */
+        .mission-message {
+            text-align: center;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #d1d5db;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 14px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-neon);
+        }
+
+        /* Accordion Hints */
+        .hints-accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .phase-group {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(10, 16, 26, 0.6);
+        }
+
+        .phase-title {
+            background: rgba(0, 242, 254, 0.1);
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--primary-neon);
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-transform: uppercase;
+        }
+
+        .hint-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hint-item:last-child {
+            border-bottom: none;
+        }
+
+        .hint-trigger {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .hint-trigger:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .hint-trigger::after {
+            content: '▼';
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .hint-trigger[aria-expanded="true"]::after {
+            transform: rotate(180deg);
+            color: var(--primary-neon);
+        }
+
+        .hint-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+            background: rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+            padding: 0 16px;
+        }
+
+        .hint-content.open {
+            padding: 14px 16px;
+        }
+
+        /* Footer / Reset Button */
+        .footer-controls {
+            margin-top: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-reset {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 8px 16px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset:hover, .btn-reset:active {
+            opacity: 1;
+            color: var(--danger-red);
+        }
+
+        /* Hidden utility */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Logo permanent en haut -->
+        <header class="logo-container">
+            <img src="PATIENT ZERO-LOGO.png" alt="PATIENT ZERO LOGO" class="app-logo" onerror="this.style.display='none'; document.getElementById('alt-logo-title').style.display='block';">
+            <h1 id="alt-logo-title" style="display:none; color: var(--primary-neon); font-size: 1.8rem; letter-spacing: 3px;">PATIENT ZERO</h1>
+        </header>
+
+        <!-- ================= PHASE 1 : BRIEFING ================= -->
+        <main id="phase-briefing" class="panel">
+            <button id="btn-briefing" class="btn">
+                <span>LANCER LA VIDEO DE BRIEFING</span>
+            </button>
+
+            <div id="video-container" class="video-wrapper">
+                <video id="briefing-video" playsinline controls>
+                    <source src="video-briefing.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+            </div>
+
+            <button id="btn-start-mission" class="btn btn-tilt hidden">
+                <span>DÉMARRER LA MISSION</span>
+            </button>
+        </main>
+
+        <!-- ================= PHASE 2 : MISSION ================= -->
+        <main id="phase-mission" class="panel">
+            <!-- Décompte -->
+            <div id="timer-box" class="timer-box">
+                <div class="timer-title">Temps Restant</div>
+                <div id="timer-display" class="timer-display">60:00</div>
+            </div>
+
+            <!-- Compteur d'indices -->
+            <div class="hints-counter-box">
+                NOMBRE D'INDICES CONSULTÉS : <span id="hints-count" class="hints-counter-value">0</span>
+            </div>
+
+            <!-- Message d'instruction -->
+            <div class="mission-message">
+                Pour commencer votre mission, ouvrez la malle.<br>
+                Bon courage, l'humanité compte sur vous !
+            </div>
+
+            <!-- Accordéon des indices -->
+            <div id="accordion-container" class="hints-accordion">
+                <!-- Généré dynamiquement en JS -->
+            </div>
+        </main>
+
+        <!-- Bouton discret de réinitialisation -->
+        <footer class="footer-controls">
+            <button id="btn-reset" class="btn-reset">Réinitialiser la partie</button>
+        </footer>
+    </div>
+
+    <!-- ================= SCRIPT JAVASCRIPT ================= -->
+    <script>
+        /* ==========================================================================
+           STRUCTURE DE DONNÉES DES INDICES
+           ========================================================================== */
+        const HINTS_DATA = [
+            {
+                phaseTitle: "PHASE 01 — PROTOCOLE",
+                hints: [
+                    { id: "p1_h1", label: "Indice 1", text: "Consultez les observations brutes et recherchez les trois effets mentionnés dans le protocole." },
+                    { id: "p1_h2", label: "Indice 2", text: "Sélectionnez les fioles rouge, jaune et verte, dans cet ordre. Lisez les numéros ACT inscrits sur leurs étiquettes pour reconstituer le code." }
+                ]
+            },
+            {
+                phaseTitle: "PHASE 02 — TRANSFUSION",
+                hints: [
+                    { id: "p2_h1", label: "Indice 1", text: "Conservez uniquement les actes du patient Z-01 et remettez-les dans l'ordre chronologique. Les volumes des poches sont écrits dans un alphabet particulier." },
+                    { id: "p2_h2", label: "Indice 2", text: "Déchiffrez les volumes en braille des poches P-09, P-17 et P-23. Additionnez les injections et soustrayez le prélèvement pour obtenir le code." },
+                    { id: "p2_h3", label: "Indice 3", text: "Effectuez le calcul suivant : 400 − 284 + 310." }
+                ]
+            },
+            {
+                phaseTitle: "PHASE 03 — AUTOPSIE",
+                hints: [
+                    { id: "p3_h1", label: "Indice 1", text: "Retrouvez les trois parties du squelette décrites dans la note. Une lumière particulière vous permettra de découvrir leurs identifiants." },
+                    { id: "p3_h2", label: "Indice 2", text: "Utilisez la lampe UV sur le crâne, la main et le pied, dans cet ordre." },
+                    { id: "p3_h3", label: "Indice 3", text: "Retrouvez les identifiants N-12, N-09 et N-02 dans le carnet d'autopsie et relevez les indices correspondants, dans cet ordre." }
+                ]
+            },
+            {
+                phaseTitle: "PHASE 04 — SPÉCIMENS INFECTÉS",
+                hints: [
+                    { id: "p4_h1", label: "Indice 1", text: "Utilisez la balance pour identifier les trois bocaux les plus lourds. Leur ordre est essentiel pour retrouver la combinaison." },
+                    { id: "p4_h2", label: "Indice 2", text: "Les bocaux à conserver sont ceux contenant l'œil, le cerveau et le cœur. Classez-les du plus léger au plus lourd et relevez leur numéro d'expérience dans cet ordre." }
+                ]
+            },
+            {
+                phaseTitle: "PHASE 05 — SYNTHÈSE INTERDITE",
+                hints: [
+                    { id: "p5_h1", label: "Indice 1", text: "Avant d'injecter l'antidote, le patient Z-01 doit être stabilisé. Un dispositif composé de plusieurs boutons permet d'activer le protocole de soins. Retrouvez-le et consultez les instructions du professeur." },
+                    { id: "p5_h2", label: "Indice 2", text: "Pour stabiliser le patient Z-01, activez les boutons dans cet ordre : rouge deux fois, bleu une fois, vert trois fois, puis bleu deux fois. Respectez cette séquence pour déclencher le protocole final." },
+                    { id: "p5_h3", label: "Indice 3", text: "Le message du professeur fait référence à quatre éléments essentiels. Pour retrouver les chiffres du dernier verrou, pensez à la durée du traitement, comptez les compagnons à plumes, examinez le dessous de la fiole contenant le poison et observez attentivement le pied gauche du patient Z-01." }
+                ]
+            }
+        ];
+
+        /* ==========================================================================
+           ÉTAT GLOBAL & LOCAL STORAGE
+           ========================================================================== */
+        const STORAGE_KEY = "patient_zero_state_v1";
+        const MISSION_DURATION_MS = 60 * 60 * 1000; // 60 minutes en ms
+
+        let state = {
+            currentPhase: 1, // 1: Briefing, 2: Mission
+            targetEndTime: null,
+            openedHintIds: []
+        };
+
+        let timerInterval = null;
+        let wakeLock = null;
+
+        // Éléments DOM
+        const elPhaseBriefing = document.getElementById('phase-briefing');
+        const elPhaseMission = document.getElementById('phase-mission');
+        const elBtnBriefing = document.getElementById('btn-briefing');
+        const elVideoContainer = document.getElementById('video-container');
+        const elVideo = document.getElementById('briefing-video');
+        const elBtnStartMission = document.getElementById('btn-start-mission');
+        const elTimerDisplay = document.getElementById('timer-display');
+        const elTimerBox = document.getElementById('timer-box');
+        const elHintsCount = document.getElementById('hints-count');
+        const elAccordionContainer = document.getElementById('accordion-container');
+        const elBtnReset = document.getElementById('btn-reset');
+
+        /* ==========================================================================
+           INITIALISATION
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            renderAccordion();
+            applyState();
+            setupEventListeners();
+        });
+
+        // Chargement de l'état
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    state = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.error("Erreur lors du chargement du localStorage:", e);
+            }
+        }
+
+        // Sauvegarde de l'état
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error("Erreur lors de la sauvegarde dans le localStorage:", e);
+            }
+        }
+
+        // Application de l'état à l'interface
+        function applyState() {
+            if (state.currentPhase === 2) {
+                elPhaseBriefing.style.display = 'none';
+                elPhaseMission.style.display = 'flex';
+                updateHintsCounter();
+                startTimer();
+                requestWakeLock();
+            } else {
+                elPhaseBriefing.style.display = 'flex';
+                elPhaseMission.style.display = 'none';
+            }
+        }
+
+        /* ==========================================================================
+           GESTION DU BRIEFING (PHASE 1)
+           ========================================================================== */
+        function setupEventListeners() {
+            // Lancer la vidéo
+            elBtnBriefing.addEventListener('click', () => {
+                elBtnBriefing.classList.add('hidden');
+                elVideoContainer.style.display = 'block';
+                elVideo.play().catch(err => {
+                    console.log("Lecture automatique bloquée ou annulée", err);
+                });
+            });
+
+            // Vidéo terminée
+            elVideo.addEventListener('ended', () => {
+                elBtnStartMission.classList.remove('hidden');
+            });
+
+            // Démarrer la mission
+            elBtnStartMission.addEventListener('click', () => {
+                state.currentPhase = 2;
+                state.targetEndTime = Date.now() + MISSION_DURATION_MS;
+                saveState();
+                applyState();
+            });
+
+            // Bouton réinitialiser
+            elBtnReset.addEventListener('click', () => {
+                if (confirm("Voulez-vous vraiment réinitialiser la partie ? Le décompte et les indices seront remis à zéro.")) {
+                    resetGame();
+                }
+            });
+        }
+
+        /* ==========================================================================
+           GESTION DU DÉCOMPTE (PHASE 2)
+           ========================================================================== */
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            updateTimerDisplay(); // Premier affichage immédiat
+            timerInterval = setInterval(updateTimerDisplay, 500);
+        }
+
+        function updateTimerDisplay() {
+            if (!state.targetEndTime) return;
+
+            const now = Date.now();
+            const remainingMs = state.targetEndTime - now;
+
+            if (remainingMs <= 0) {
+                clearInterval(timerInterval);
+                elTimerDisplay.textContent = "TEMPS ÉCOULÉ";
+                elTimerDisplay.style.fontSize = "2.2rem";
+                elTimerBox.classList.add('timer-warning');
+                elTimerBox.classList.remove('timer-blink');
+                return;
+            }
+
+            const totalSeconds = Math.floor(remainingMs / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+
+            const formattedMinutes = String(minutes).padStart(2, '0');
+            const formattedSeconds = String(seconds).padStart(2, '0');
+
+            elTimerDisplay.textContent = `${formattedMinutes}:${formattedSeconds}`;
+
+            // Gestion visuelle sous 10 min et 1 min
+            if (totalSeconds < 60) {
+                // Moins de 1 minute
+                elTimerBox.classList.add('timer-warning', 'timer-blink');
+            } else if (totalSeconds < 600) {
+                // Moins de 10 minutes
+                elTimerBox.classList.add('timer-warning');
+                elTimerBox.classList.remove('timer-blink');
+            } else {
+                elTimerBox.classList.remove('timer-warning', 'timer-blink');
+            }
+        }
+
+        /* ==========================================================================
+           GESTION DES INDICES (ACCORDÉON)
+           ========================================================================== */
+        function renderAccordion() {
+            elAccordionContainer.innerHTML = '';
+
+            HINTS_DATA.forEach(group => {
+                const groupEl = document.createElement('div');
+                groupEl.className = 'phase-group';
+
+                const titleEl = document.createElement('div');
+                titleEl.className = 'phase-title';
+                titleEl.textContent = group.phaseTitle;
+                groupEl.appendChild(titleEl);
+
+                group.hints.forEach(hint => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'hint-item';
+
+                    const isOpenedBefore = state.openedHintIds.includes(hint.id);
+
+                    const triggerBtn = document.createElement('button');
+                    triggerBtn.className = 'hint-trigger';
+                    triggerBtn.setAttribute('aria-expanded', 'false');
+                    triggerBtn.setAttribute('aria-controls', `content-${hint.id}`);
+                    triggerBtn.textContent = hint.label;
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.id = `content-${hint.id}`;
+                    contentDiv.className = 'hint-content';
+                    contentDiv.textContent = hint.text;
+
+                    triggerBtn.addEventListener('click', () => {
+                        const isOpen = triggerBtn.getAttribute('aria-expanded') === 'true';
+
+                        if (isOpen) {
+                            // Refermer
+                            triggerBtn.setAttribute('aria-expanded', 'false');
+                            contentDiv.style.maxHeight = null;
+                            contentDiv.classList.remove('open');
+                        } else {
+                            // Ouvrir
+                            triggerBtn.setAttribute('aria-expanded', 'true');
+                            contentDiv.classList.add('open');
+                            contentDiv.style.maxHeight = contentDiv.scrollHeight + 28 + "px";
+
+                            // Comptabiliser l'indice si première ouverture
+                            if (!state.openedHintIds.includes(hint.id)) {
+                                state.openedHintIds.push(hint.id);
+                                saveState();
+                                updateHintsCounter();
+                            }
+                        }
+                    });
+
+                    itemEl.appendChild(triggerBtn);
+                    itemEl.appendChild(contentDiv);
+                    groupEl.appendChild(itemEl);
+                });
+
+                elAccordionContainer.appendChild(groupEl);
+            });
+        }
+
+        function updateHintsCounter() {
+            elHintsCount.textContent = state.openedHintIds.length;
+        }
+
+        /* ==========================================================================
+           WAKE LOCK API (Évite la mise en veille)
+           ========================================================================== */
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                // Gestion d'erreur silencieuse si le navigateur refuse le Wake Lock
+                console.log("Wake Lock indisponible ou bloqué:", err.message);
+            }
+        }
+
+        // Réactiver le Wake Lock si l'utilisateur revient sur l'onglet
+        document.addEventListener('visibilitychange', () => {
+            if (wakeLock !== null && document.visibilityState === 'visible' && state.currentPhase === 2) {
+                requestWakeLock();
+            }
+        });
+
+        /* ==========================================================================
+           RÉINITIALISATION
+           ========================================================================== */
+        function resetGame() {
+            if (timerInterval) clearInterval(timerInterval);
+            if (wakeLock) {
+                wakeLock.release().catch(() => {});
+                wakeLock = null;
+            }
+
+            state = {
+                currentPhase: 1,
+                targetEndTime: null,
+                openedHintIds: []
+            };
+
+            localStorage.removeItem(STORAGE_KEY);
+
+            // Re-initialiser l'interface vidéo
+            elVideo.pause();
+            elVideo.currentTime = 0;
+            elVideoContainer.style.display = 'none';
+            elBtnBriefing.classList.remove('hidden');
+            elBtnStartMission.classList.add('hidden');
+            elTimerDisplay.style.fontSize = "3.5rem";
+            elTimerBox.classList.remove('timer-warning', 'timer-blink');
+
+            renderAccordion();
+            applyState();
+        }
+    </script>
+</body>
+</html>
